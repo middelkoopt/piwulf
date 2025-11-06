@@ -1,0 +1,9 @@
+{{ nobackup }}
+{{ $images := dict }}
+{{ range $node := $.AllNodes}}
+{{ $_ := set $images .ImageName true }}
+{{ end }}
+{{ range $imageName, $_ := $images }}
+{{ file $imageName }}
+{{ softlink (printf "/var/lib/warewulf/chroots/%s/rootfs/boot/efi" $imageName) }}
+{{ end }}

@@ -1,0 +1,4 @@
+*.img
+*.img.gz
+site.json
+authorized_keys

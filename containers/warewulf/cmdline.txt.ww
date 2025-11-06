@@ -1,0 +1,6 @@
+{{- nobackup }}
+{{- range $node := .AllNodes }}
+{{- $cmdline := print "cmdline-" .Tags.Serial ".txt" }}
+{{- file $cmdline }}
+{{ .Kernel.Args | join " " }} ip=dhcp root=wwinit:/dev/disk/by-partlabel/rootfs wwid={{ .NetDevs.default.Hwaddr }} wwinit.uri=http://{{ $.Ipaddr }}:{{ $.Warewulf.Port }}/provision/{{ .NetDevs.default.Hwaddr }} rd.neednet=1 rd.shell
+{{ end -}}

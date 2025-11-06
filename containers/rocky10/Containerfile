@@ -1,0 +1,31 @@
+FROM registry.ipv6.docker.com/rockylinux/rockylinux:10
+
+## Update and setup Rocky
+RUN dnf update -y && \
+    dnf install -y dnf-utils epel-release && \
+    dnf config-manager --set-enabled crb && \
+    dnf update -y
+
+## RPi repo and kernel
+RUN dnf install -y rocky-release-rpi && \
+    dnf install -y kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
+
+## Provisioner Metadata
+LABEL pi.provision.partition='[{"name":"piboot","size":"512MiB","type":"vfat","path":"/boot/efi"},{"name":"piroot","type":"ext4","path":"/"}]'
+LABEL pi.provision.hosts='["127.0.0.1 localhost", "::1       localhost"]'
+LABEL pi.provision.resolv='"../run/NetworkManager/no-stub-resolv.conf"'
+
+## Install tools
+RUN dnf install -y ca-certificates procps zstd jq yq && \
+    dnf install -y initscripts-service cpio pigz && \
+    dnf install -y openssh openssh-clients openssh-server iproute iputils NetworkManager sudo && \
+    dnf install -y nano vim less bash-completion man
+
+## Configure system
+ENV OS_RELEASE='el10'
+RUN passwd -d root && \
+    sed -i '/alias/d' /root/.bashrc && \
+    systemctl enable sshd.service
+COPY --chmod=600 end*.nmconnection /etc/NetworkManager/system-connections/
+COPY config.txt cmdline.txt /boot/efi/
+COPY authorized_keys /root/.ssh/authorized_keys

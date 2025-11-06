@@ -1,0 +1,15 @@
+[connection]
+id=end0
+uuid=0e0c8724-e6fb-4fff-8e5a-ee7573d9ef8c
+type=ethernet
+interface-name=end0
+
+[ethernet]
+
+[ipv4]
+method=manual
+address=10.5.0.1/16
+
+[ipv6]
+method=manual
+address=fd00:400:5::1/64

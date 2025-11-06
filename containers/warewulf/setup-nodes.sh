@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+## Create profile
+wwctl profile delete --yes nodes || true
+wwctl profile add nodes --profile default
+wwctl profile set --yes nodes \
+  --kernelargs '"console=ttyS0,115200"' \
+  --image nodeimage \
+  --netdev=eth0 --netmask=255.255.0.0 --gateway=10.5.0.1 --nettagadd="DNS=10.5.0.1"
+
+## Add to-stage provision to disk
+wwctl profile set --yes nodes \
+  --diskname /dev/mmcblk0 --diskwipe \
+  --partname rootfs --partcreate --partnumber 1 \
+  --fsname rootfs --fswipe --fsformat ext4 --fspath / \
+  --root=/dev/disk/by-partlabel/rootfs 
+
+## Create nodes
+for n in k81 k82 k83 k400 ; do
+  serial=$(jq -r ".nodes.${n}.serial" site.json)
+  mac=$(jq -r ".nodes.${n}.mac" site.json)
+  i=$((i+1))
+  wwctl node delete --yes ${n} || true
+  wwctl node add ${n} --profile=nodes 
+  wwctl node set --yes ${n} \
+    --tagadd="Serial=${serial: -8}" \
+    --hwaddr=${mac} \
+    --ipaddr=10.5.1.${i}
+done
+
+## Import overlays
+for I in *.ww ; do
+  wwctl overlay import --overwrite host $I /var/lib/tftpboot/
+done
+
+## Rebuild overlays and configure
+wwctl overlay build
+wwctl configure --all

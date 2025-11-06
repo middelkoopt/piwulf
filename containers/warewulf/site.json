@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "k51": {
+      "hardware": "pi5",
+      "serial": "fb78f65cbe512421",
+      "mac": "d8:3a:dd:98:09:77"
+    },
+    "k52": {
+      "hardware": "pi5",
+      "serial": "cff0f163563cea77",
+      "mac": "d8:3a:dd:c5:c1:f3"
+    },
+    "k400": {
+      "hardware": "pi400",
+      "serial": "1000000000fadff1",
+      "mac": "e4:5f:01:1d:17:a2"
+    },
+    "k81": {
+      "hardware": "pi4",
+      "serial": "100000002f7522b7",
+      "mac": "d8:3a:dd:15:b4:23"
+    },
+    "k82": {
+      "hardware": "pi4",
+      "serial": "100000001a2664ed",
+      "mac": "d8:3a:dd:15:ae:7d"
+    },
+    "k83": {
+      "hardware": "pi4",
+      "serial": "1000000010e8db67",
+      "mac": "d8:3a:dd:47:a1:10"
+    },
+    "k41": {
+      "hardware": "pi4",
+      "serial": "100000006dd423b5",
+      "mac": "dc:a6:32:e4:e4:e1"
+    },
+    "k42": {
+      "hardware": "pi4",
+      "serial": "100000003c67557c",
+      "mac": "e4:5f:01:c1:92:b8"
+    }
+  }
+}

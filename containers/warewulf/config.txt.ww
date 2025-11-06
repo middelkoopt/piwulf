@@ -1,0 +1,29 @@
+{{- file "config.txt" }}
+{{- nobackup }}
+## Boot configuration
+usb_max_current_enable=1
+auto_initramfs=1
+arm_64bit=1
+arm_boost=1
+
+## Serial Debug
+start_debug=1
+uart_2ndstage=1
+dtoverlay=disable-bt
+enable_uart=1
+
+## Node Configuration
+#[serial]
+#start_file=nodeimage/start4db.elf
+#fixup_file=nodeimage/fixup4db.dat
+#os_prefix=nodeimage/
+#cmdline=node-NODE.txt
+{{ range $node := .AllNodes -}}
+{{ $cmdline := print "cmdline-" .Tags.Serial ".txt" }}
+## {{ .Id }}
+[{{ .Tags.Serial }}]
+start_file={{ .ImageName }}/start4db.elf
+fixup_file={{ .ImageName }}/fixup4db.dat
+os_prefix={{ .ImageName }}/
+cmdline={{ $cmdline }}
+{{ end -}}

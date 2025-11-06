@@ -1,0 +1,67 @@
+FROM rocky10:latest AS warewulf
+
+## Configure system
+RUN dnf install -y chrony && \
+    systemctl enable chronyd.service
+RUN echo 'allow 10.5.0.0/16' >> /etc/chrony.conf
+
+## Setup nftables
+RUN dnf install -y nftables && \
+    systemctl enable nftables.service && \
+    echo 'net.ipv4.ip_forward = 1' > /etc/sysctl.d/80-ip_forward.conf
+COPY nat.nft /etc/sysconfig/nftables.conf
+
+## Warewulf build dependencies
+# RUN dnf install -y git unzip cpio && \
+#     dnf install -y golang make && \
+#     dnf install -y --setopt=install_weak_deps=False gpgme-devel python3-sphinx python3-sphinx_rtd_theme
+
+## Build Warewulf
+# ARG WW_VERSION=v4.6.4
+# RUN git clone --no-checkout https://github.com/warewulf/warewulf.git /usr/src/warewulf && \
+#     cd /usr/src/warewulf && \
+#     git checkout -B ${WW_VERSION} refs/tags/${WW4_VERSION} && \
+#     make config \
+#       PREFIX=/usr \
+#       SYSCONFDIR=/etc \
+#       LOCALSTATEDIR=/var/lib \
+#       SHAREDSTATEDIR=/var/lib \
+#       TFTPDIR=/var/lib/tftpboot && \
+#     make all && \
+#     make build && \
+#     make install && \
+#     wwctl completion bash > /etc/bash_completion.d/wwctl
+
+## Install Warewulf
+ARG WW_VERSION=4.6.4
+RUN dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-${WW_VERSION}-1.${OS_RELEASE}.$(uname -m).rpm && \
+    dnf install -y ipxe-bootimgs-aarch64 ipxe-bootimgs-x86 && \
+    systemctl enable warewulfd.service dnsmasq.service
+
+## Setup warewulf.conf
+RUN yq -i '\
+      .ipaddr = "10.5.0.1" | \
+      .netmask = "255.255.0.0" | \
+      .network = "10.5.0.0" | \
+      .dhcp.["range start"] = "10.5.1.1" | \
+      .dhcp.["range end"] = "10.5.1.254" | \
+      .paths.ipxesource = "/usr/share/ipxe"' \
+    /etc/warewulf/warewulf.conf && \
+    yq -i '\
+      .nodeprofiles.default.resources.fstab[].mntops |= sub("defaults,noauto", "defaults") | \
+      del(.nodeprofiles.default.kernel.args[] | select(. == "quiet"))' \
+    /etc/warewulf/nodes.conf
+
+## Setup dnsmasq
+RUN echo 'listen-address=10.5.0.1' > /etc/dnsmasq.d/ww4-interface.conf && \
+    echo 'pxe-service=0,"Raspberry Pi Boot"' > /etc/dnsmasq.d/ww4-rpi.conf
+
+## Configure user
+ARG USER=admin
+RUN useradd --create-home --shell=/bin/bash --user-group -G wheel $USER && passwd -d $USER
+USER $USER
+WORKDIR /home/$USER
+RUN sudo id > /dev/null && \
+    install -vdp --mode 700 .ssh/
+COPY --chmod=600 --chown=$USER:$USER authorized_keys .ssh/
+COPY --chmod=755 --chown=$USER:$USER site.json *.sh *.ww ./
