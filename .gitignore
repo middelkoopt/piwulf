@@ -2,3 +2,5 @@
 *.img.gz
 site.json
 authorized_keys
+id_rsa
+id_rsa.pub

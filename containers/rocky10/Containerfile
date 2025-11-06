@@ -1,4 +1,4 @@
-FROM registry.ipv6.docker.com/rockylinux/rockylinux:10
+FROM registry.docker.com/rockylinux/rockylinux:10
 
 ## Update and setup Rocky
 RUN dnf update -y && \
@@ -9,11 +9,6 @@ RUN dnf update -y && \
 ## RPi repo and kernel
 RUN dnf install -y rocky-release-rpi && \
     dnf install -y kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
-
-## Provisioner Metadata
-LABEL pi.provision.partition='[{"name":"piboot","size":"512MiB","type":"vfat","path":"/boot/efi"},{"name":"piroot","type":"ext4","path":"/"}]'
-LABEL pi.provision.hosts='["127.0.0.1 localhost", "::1       localhost"]'
-LABEL pi.provision.resolv='"../run/NetworkManager/no-stub-resolv.conf"'
 
 ## Install tools
 RUN dnf install -y ca-certificates procps zstd jq yq && \
