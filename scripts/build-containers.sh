@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
-for IMAGE in rocky10 warewulf ; do
-    podman build --progress=plain -t ${IMAGE} --build-arg "USER=${USER}" containers/${IMAGE} $*
+: ${PODMAN:=podman}
+
+# Customize image user with `./build-containers.sh --build-arg "USER=${USER}"`
+
+echo "=== build-containers.sh"
+for IMAGE in rocky10 warewulf tools ; do
+    echo "--- Building image: ${IMAGE}"
+    $PODMAN build --progress=plain -t ${IMAGE} containers/${IMAGE} $*
 done

@@ -1,0 +1,15 @@
+FROM registry.docker.com/library/debian:13
+
+## Update and setup Debian
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install --yes apt-utils && \
+    apt-get dist-upgrade --yes && \
+    apt-get clean
+
+## Install tools
+RUN apt-get install --yes jq e2fsprogs libarchive-tools fdisk mtools && \
+    apt-get clean
+
+## Setup env
+RUN mkdir -v /data
+WORKDIR /data

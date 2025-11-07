@@ -1,1 +1,1 @@
-console=serial0,115200 root=PARTLABEL=piroot fsck.repair=yes rootwait
+console=serial0,115200 root=PARTLABEL=rootfs fsck.repair=yes rootwait

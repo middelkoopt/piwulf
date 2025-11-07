@@ -16,6 +16,11 @@ RUN dnf install -y ca-certificates procps zstd jq yq && \
     dnf install -y openssh openssh-clients openssh-server iproute iputils NetworkManager sudo && \
     dnf install -y nano vim less bash-completion man
 
+## Setup .mount units
+COPY *.mount /etc/systemd/system/
+RUN echo "PARTLABEL=rootfs / ext4 defaults,noatime 0 1" > /etc/fstab && \ 
+    systemctl enable boot-efi.mount
+
 ## Configure system
 ENV OS_RELEASE='el10'
 RUN passwd -d root && \
