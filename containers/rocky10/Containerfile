@@ -12,7 +12,7 @@ RUN dnf install -y dracut && \
 
 ## RPi repo and kernel
 RUN dnf install -y rocky-release-rpi && \
-    dnf install -y kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
+    dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
 
 ## Install tools
 RUN dnf install -y ca-certificates procps zstd jq yq && \

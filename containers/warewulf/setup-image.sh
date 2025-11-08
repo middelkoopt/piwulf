@@ -27,7 +27,7 @@ echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf
 dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-dracut-${WW_VERSION}-1.EL${OS_RELEASE}.noarch.rpm
 
 ## Install RPi kernel
-dnf install -y kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
+dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
 
 ## Install tools
 dnf install -y \
