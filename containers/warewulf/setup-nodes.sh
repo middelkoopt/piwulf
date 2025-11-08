@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+: ${SITE:=site.json}
+
 echo "=== setup-nodes.sh"
 
 ## Create profile
@@ -19,9 +21,9 @@ wwctl profile set --yes nodes \
   --root=/dev/disk/by-partlabel/rootfs 
 
 ## Create nodes
-for n in c1 ; do
-  serial=$(jq -r ".nodes.${n}.serial" site.json)
-  mac=$(jq -r ".nodes.${n}.mac" site.json)
+for n in $(jq -r ".nodes | keys[]" $SITE) ; do
+  serial=$(jq -r ".nodes.${n}.serial" $SITE)
+  mac=$(jq -r ".nodes.${n}.mac" $SITE)
   i=$((i+1))
   wwctl node delete --yes ${n} || true
   wwctl node add ${n} --profile=nodes 

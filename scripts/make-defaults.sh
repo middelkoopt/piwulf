@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+shopt -s nullglob
 
 echo "=== ./make-defaults.sh ==="
 
@@ -13,5 +14,11 @@ done
 
 echo "--- Copy site.json template"
 if [[ ! -f ./containers/warewulf/site.json ]] ; then
-    cp -v ./containers/warewulf/site.json.template ./containers/warewulf/site.json
+    cp -v ./containers/examples/site.json ./containers/warewulf/site.json
+fi
+
+echo "--- Copy networking examples"
+EXAMPLES=(./containers/rocky10/*.nmconnection)
+if [[ ${#EXAMPLES[@]} == 0 ]] ; then
+    cp -v ./examples/*.nmconnection ./containers/rocky10
 fi
