@@ -1,5 +1,8 @@
 FROM rocky10:latest AS warewulf
 
+## Raspberry Pi tools
+RUN dnf install -y rocky-sbc-utils cloud-utils-growpart e2fsprogs mtools parted
+
 ## Configure system
 RUN dnf install -y chrony && \
     systemctl enable chronyd.service
@@ -55,6 +58,10 @@ RUN yq -i '\
 ## Setup dnsmasq
 RUN echo 'listen-address=10.5.0.1' > /etc/dnsmasq.d/ww4-interface.conf && \
     echo 'pxe-service=0,"Raspberry Pi Boot"' > /etc/dnsmasq.d/ww4-rpi.conf
+
+## Enable man pages
+RUN sed -i '/tsflags=nodocs/d' /etc/dnf/dnf.conf && \
+    dnf install -y man man-db man-pages
 
 ## Configure user
 ARG USER=admin

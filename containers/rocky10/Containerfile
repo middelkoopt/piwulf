@@ -6,7 +6,7 @@ RUN dnf update -y && \
     dnf config-manager --set-enabled crb && \
     dnf update -y
 
-## Install kernel dependencies and configure
+## Install kernel dependencies and configure Dracut
 RUN dnf install -y dracut && \
     echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 
@@ -18,7 +18,7 @@ RUN dnf install -y rocky-release-rpi && \
 RUN dnf install -y ca-certificates procps zstd jq yq && \
     dnf install -y initscripts-service cpio pigz && \
     dnf install -y openssh openssh-clients openssh-server iproute iputils NetworkManager sudo && \
-    dnf install -y nano vim less bash-completion man
+    dnf install -y nano vim less bash-completion
 
 ## Setup .mount units
 COPY *.mount /etc/systemd/system/
