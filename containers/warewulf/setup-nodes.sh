@@ -38,6 +38,6 @@ for I in *.ww ; do
   wwctl overlay import --overwrite host $I /var/lib/tftpboot/
 done
 
-## Rebuild overlays and configure
-wwctl overlay build
+## Reconfigure warewulf and build overlays
 wwctl configure --all
+wwctl overlay build
