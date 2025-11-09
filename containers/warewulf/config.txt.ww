@@ -22,8 +22,10 @@ enable_uart=1
 {{ $cmdline := print "cmdline-" .Tags.Serial ".txt" }}
 ## {{ .Id }}
 [{{ .Tags.Serial }}]
-start_file={{ .ImageName }}/start4db.elf
-fixup_file={{ .ImageName }}/fixup4db.dat
-os_prefix={{ .ImageName }}/
+start_file=/{{ .ImageName }}/start4db.elf
+fixup_file=/{{ .ImageName }}/fixup4db.dat
+os_prefix=/{{ .ImageName }}/
+kernel=/{{ .ImageName }}/kernel8
+initramfs /{{ .ImageName }}/initramfs8
 cmdline={{ $cmdline }}
 {{ end -}}

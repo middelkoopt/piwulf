@@ -9,7 +9,7 @@ echo "=== setup-nodes.sh"
 wwctl profile delete --yes nodes || true
 wwctl profile add nodes --profile default
 wwctl profile set --yes nodes \
-  --kernelargs '"console=ttyS0,115200"' \
+  --kernelargs '"console=serial0,115200"' \
   --image nodeimage \
   --netdev=eth0 --netmask=255.255.0.0 --gateway=10.5.0.1 --nettagadd="DNS=10.5.0.1"
 

@@ -31,6 +31,6 @@ RUN passwd -d root && \
     sed -i '/alias/d' /root/.bashrc && \
     systemctl enable sshd.service && \
     cp /dev/null /etc/machine-id
-COPY --chmod=600 end*.nmconnection /etc/NetworkManager/system-connections/
+COPY --chmod=600 *.nmconnection /etc/NetworkManager/system-connections/
 COPY config.txt cmdline.txt /boot/efi/
 COPY authorized_keys /root/.ssh/authorized_keys

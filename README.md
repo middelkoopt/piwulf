@@ -17,7 +17,7 @@ Configure an image
 * Add network configuration by placing *.nmconnection files for the node in `./containers/rocky10`.  The internal network should be statically configured.
 * Describe your nodes with `./containers/warewulf/site.json`
 * Set root ssh key in `./containers/rocky10/authorized_keys`
-* Set user key (same as the $USER to build the container) in `./containers/rocky10/authorized_keys`
+* Set admin key in `./containers/rocky10/authorized_keys`
 * Run `./scripts/make-defaults.sh` to generate some defaults. See script file and examples for details.
 
 Build the image (podman or docker required), gzip optional
@@ -36,10 +36,10 @@ installed.
 Write `./tmp/warewulf-image.img` to a sd card and boot a Pi. **WARNING: this erases `/dev/mmcblk0`, which might be your OS!**
 ```bash
 blkdiscard -f /dev/mmcblk0
-zcat warewulf-image.img.gz | dd of=/dev/mmcblk0 bs=1M conv=sparse status=progress
+zcat warewulf-image.img.gz | dd of=/dev/mmcblk0 bs=1M status=progress
 ```
 
-Login to the user account (`$USER`) and run:
+Login to the admin and run:
 ```bash
 sudo ./setup-head.sh
 sudo ./setup-image.sh
