@@ -9,8 +9,9 @@ echo "=== setup-nodes.sh"
 wwctl profile delete --yes nodes || true
 wwctl profile add nodes --profile default
 wwctl profile set --yes nodes \
-  --kernelargs '"console=serial0,115200"' \
   --image nodeimage \
+  --tagadd "Firmware=efi" \
+  --kernelargs '"console=serial0,115200"' \
   --netdev=eth0 --netmask=255.255.0.0 --gateway=10.5.0.1 --nettagadd="DNS=10.5.0.1"
 
 ## Add to-stage provision to disk

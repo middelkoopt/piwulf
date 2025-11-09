@@ -5,5 +5,5 @@
 {{ end }}
 {{ range $imageName, $_ := $images }}
 {{ file $imageName }}
-{{ softlink (printf "/var/lib/warewulf/chroots/%s/rootfs/boot/efi" $imageName) }}
+{{ softlink (printf "/var/lib/warewulf/chroots/%s/rootfs/boot" $imageName) }}
 {{ end }}

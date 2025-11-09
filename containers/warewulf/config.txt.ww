@@ -13,19 +13,15 @@ dtoverlay=disable-bt
 enable_uart=1
 
 ## Node Configuration
-#[serial]
-#start_file=nodeimage/start4db.elf
-#fixup_file=nodeimage/fixup4db.dat
-#os_prefix=nodeimage/
-#cmdline=node-NODE.txt
 {{ range $node := .AllNodes -}}
+{{ $firmware := printf "/%s/%s" .ImageName ( default "efi" .Tags.Firmware ) }}
 {{ $cmdline := print "cmdline-" .Tags.Serial ".txt" }}
 ## {{ .Id }}
 [{{ .Tags.Serial }}]
-start_file=/{{ .ImageName }}/start4db.elf
-fixup_file=/{{ .ImageName }}/fixup4db.dat
-os_prefix=/{{ .ImageName }}/
-kernel=/{{ .ImageName }}/kernel8
-initramfs /{{ .ImageName }}/initramfs8
+start_file={{ $firmware }}/start4db.elf
+fixup_file={{ $firmware }}/fixup4db.dat
+os_prefix={{ $firmware }}/
+kernel={{ $firmware }}/kernel8
+initramfs {{ $firmware }}/initramfs8
 cmdline={{ $cmdline }}
 {{ end -}}
