@@ -29,11 +29,16 @@ sudo wwctl configure --all
 ## Debian 13 nodes
 ```bash
 ( cd ./containers/debian13 && ../build.sh )
-podman save debian13:latest > ./tmp/debian13.tar
-sudo wwctl image import ./tmp/debian13.tar debian13
-rm -v ./tmp/debian13.tar
 
+podman save debian13:latest > ./tmp/debian13.tar
+sudo wwctl image import --force ./tmp/debian13.tar debian13
+
+sudo wwctl profile set --yes nodes --image debian13
 sudo wwctl profile set --yes nodes --tagadd "Firmware=firmware"
+
+sudo wwctl configure --all
+sudo wwctl image build debian13
+sudo wwctl overlay build
 ```
 
  ## Development

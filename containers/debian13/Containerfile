@@ -3,7 +3,7 @@ FROM registry.docker.com/library/debian:13
 ENV LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update and setup Debian
+## Update and setup Debian
 RUN apt-get update && \
     apt-get install --yes apt-utils && \
     apt-get dist-upgrade --yes --purge
@@ -16,23 +16,30 @@ RUN . /etc/os-release && \
     apt-get update && \
     apt-get dist-upgrade --yes
 
-## Install kernel dependencies and configure Dracut
-RUN apt-get install --yes dracut && \
-    echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
-
-## Install firmware and kernel (ubuntu: linux-firmware-raspi) and kernel
-RUN apt-get install --yes --no-install-recommends \
-    raspi-firmware linux-image-rpi-v8 linux-image-rpi-2712 \
-    firmware-brcm80211 firmware-realtek wireless-regdb bluez-firmware && \
-    chmod 644 /boot/firmware/kernel8 /boot/firmware/initramfs8 && \
-    rm -v /vmlinuz* /initrd.img*
-
 ## Install base packages
-RUN apt-get install --yes --no-install-recommends curl jq zstd cpio pigz procps iproute2 && \
+RUN apt-get install --yes --no-install-recommends ca-certificates curl jq zstd cpio pigz procps iproute2 && \
     apt-get install --yes --no-install-recommends init udev dbus polkitd && \
     apt-get install --yes --no-install-recommends systemd-timesyncd systemd-resolved ifupdown && \
     apt-get install --yes --no-install-recommends openssh-server python3 && \
     apt-get install --yes nano vim less bash-completion iputils-ping bind9-host
+
+## Install and configure Dracut first (remove password for dracut initramfs)
+RUN passwd -d root && \
+    apt-get install --yes dracut && \
+    echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
+
+## Install and configure Warewulf Dracut
+ARG WAREWULF_VERSION="4.6.4"
+RUN apt-get install --yes dmidecode dracut-network ignition rpm2cpio && \
+    curl -L https://github.com/warewulf/warewulf/releases/download/v${WAREWULF_VERSION}/warewulf-dracut-${WAREWULF_VERSION}-1.el10.noarch.rpm | rpm2cpio | cpio -idmf && \
+    echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf
+
+## Install firmware and kernel (ubuntu: linux-firmware-raspi) and kernel
+RUN apt-get install --yes --no-install-recommends \
+        raspi-firmware firmware-brcm80211 firmware-realtek wireless-regdb bluez-firmware && \
+    apt-get install --yes --no-install-recommends linux-image-rpi-v8 && \
+    chmod 644 /boot/firmware/initramfs8 && \
+    rm -v /vmlinuz* /initrd.img*
 
 ## Configure system
 ENV OS_RELEASE='debian13'

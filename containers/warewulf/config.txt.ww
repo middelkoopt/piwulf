@@ -21,7 +21,7 @@ enable_uart=1
 start_file={{ $firmware }}/start4db.elf
 fixup_file={{ $firmware }}/fixup4db.dat
 os_prefix={{ $firmware }}/
-kernel={{ $firmware }}/kernel8
+kernel={{ $firmware }}/kernel8.img
 initramfs {{ $firmware }}/initramfs8
 cmdline={{ $cmdline }}
 {{ end -}}
