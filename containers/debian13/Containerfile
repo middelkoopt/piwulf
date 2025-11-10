@@ -28,6 +28,9 @@ RUN passwd -d root && \
     apt-get install --yes dracut && \
     echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 
+## FIXME: patch dracut to allow dracut emergency shell without password
+RUN mv -v /usr/lib/dracut/modules.d/60systemd-sysusers /usr/lib/dracut/modules.d/99systemd-sysusers
+
 ## Install and configure Warewulf Dracut
 ARG WAREWULF_VERSION="4.6.4"
 RUN apt-get install --yes dmidecode dracut-network ignition rpm2cpio && \
