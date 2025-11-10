@@ -33,7 +33,7 @@ RUN mv -v /usr/lib/dracut/modules.d/60systemd-sysusers /usr/lib/dracut/modules.d
 
 ## Install and configure Warewulf Dracut
 ARG WAREWULF_VERSION="4.6.4"
-RUN apt-get install --yes dmidecode dracut-network ignition rpm2cpio && \
+RUN apt-get install --yes dmidecode dracut-network ignition gdisk rpm2cpio && \
     curl -L https://github.com/warewulf/warewulf/releases/download/v${WAREWULF_VERSION}/warewulf-dracut-${WAREWULF_VERSION}-1.el10.noarch.rpm | rpm2cpio | cpio -idmf && \
     echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf
 
