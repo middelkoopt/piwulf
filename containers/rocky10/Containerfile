@@ -28,6 +28,9 @@ RUN dnf install -y ca-certificates procps zstd jq yq && \
     dnf install -y bind-utils nfs-utils systemd-timesyncd && \
     dnf install -y nano vim less bash-completion man
 
+## FIXME: Reinstall packages that require capabilities (required for podman)
+RUN dnf reinstall -y shadow-utils
+
 ## Configure system
 LABEL firmware="efi"
 RUN passwd -d root && \
