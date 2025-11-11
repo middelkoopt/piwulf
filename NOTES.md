@@ -26,25 +26,6 @@ done
 sudo wwctl configure --all
 ```
 
-## Debian 13 nodes
-```bash
-( cd ./containers/debian13 && ../build.sh )
-
-podman save debian13:latest > ./tmp/debian13.tar
-sudo wwctl image import --force ./tmp/debian13.tar debian13
-
-sudo wwctl profile set --yes nodes --image debian13
-sudo wwctl profile set --yes nodes --tagadd "Firmware=firmware"
-
-sudo wwctl configure --all
-sudo wwctl image build debian13
-sudo wwctl overlay build
-```
-
- ## Development
- ToDo:
- * Make Rocky10 a node image and move the following to the warewulf container
-   * Move end*.nmconnection
-   * Move *.mount
-   * Move config.txt and cmdline.txt
-   * possibly remove authorized_key
+## Development
+ToDo:
+ *
