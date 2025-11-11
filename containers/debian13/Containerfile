@@ -30,6 +30,7 @@ RUN passwd -d root && \
     echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 
 ## FIXME: patch dracut to allow dracut emergency shell without password
+# https://github.com/dracut-ng/dracut-ng/pull/1212/files
 RUN mv -v /usr/lib/dracut/modules.d/60systemd-sysusers /usr/lib/dracut/modules.d/99systemd-sysusers
 
 ## Install and configure Warewulf Dracut
