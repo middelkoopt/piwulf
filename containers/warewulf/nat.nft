@@ -2,6 +2,6 @@ flush ruleset
 table ip nat {
     chain postrouting {
         type nat hook postrouting priority 100; policy accept;
-        oifname "end0.23" masquerade
+        ip saddr 10.5.0.0/16 masquerade
     }
 }
