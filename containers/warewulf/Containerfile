@@ -3,6 +3,15 @@ FROM rocky10:latest AS warewulf
 ## Raspberry Pi tools
 RUN dnf install -y rocky-sbc-utils cloud-utils-growpart e2fsprogs mtools parted
 
+## Configure container to boot
+COPY config.txt cmdline.txt /boot/efi/
+COPY --chmod=600 *.nmconnection /etc/NetworkManager/system-connections/
+
+## Setup fstab and systemd .mount units
+COPY *.mount /etc/systemd/system/
+RUN echo "PARTLABEL=rootfs / ext4 defaults,noatime 0 1" > /etc/fstab && \ 
+    systemctl enable boot-efi.mount
+
 ## Configure system
 RUN dnf install -y chrony && \
     systemctl enable chronyd.service

@@ -4,21 +4,21 @@ shopt -s nullglob
 
 echo "=== ./make-defaults.sh ==="
 
-echo "--- Generating SSH keys for container images"
-for IMAGE in rocky10 warewulf ; do
+for IMAGE in warewulf ; do
     if [[ ! -f ./containers/${IMAGE}/authorized_keys ]] ; then
+        echo "--- Generating SSH keys for ${IMAGE} container"
         ssh-keygen -f ./containers/${IMAGE}/id_rsa -N "" -C "piwulf ${IMAGE} key"
         cp -v ./containers/${IMAGE}/id_rsa.pub ./containers/${IMAGE}/authorized_keys
     fi
 done
 
-echo "--- Copy site.json template"
 if [[ ! -f ./containers/warewulf/site.json ]] ; then
+    echo "--- Copy site.json template"
     cp -v ./containers/examples/site.json ./containers/warewulf/site.json
 fi
 
-echo "--- Copy networking examples"
-EXAMPLES=(./containers/rocky10/*.nmconnection)
+EXAMPLES=(./containers/warewulf/*.nmconnection)
 if [[ ${#EXAMPLES[@]} == 0 ]] ; then
-    cp -v ./examples/*.nmconnection ./containers/rocky10
+    echo "--- Copy networking examples"
+    cp -v ./examples/*.nmconnection ./containers/warewulf
 fi

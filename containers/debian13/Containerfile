@@ -1,4 +1,5 @@
 FROM registry.docker.com/library/debian:13
+ENV OS_RELEASE='debian13'
 
 ENV LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
@@ -32,9 +33,9 @@ RUN passwd -d root && \
 RUN mv -v /usr/lib/dracut/modules.d/60systemd-sysusers /usr/lib/dracut/modules.d/99systemd-sysusers
 
 ## Install and configure Warewulf Dracut
-ARG WAREWULF_VERSION="4.6.4"
+ARG WW_VERSION="4.6.4"
 RUN apt-get install --yes dmidecode dracut-network ignition gdisk rpm2cpio && \
-    curl -L https://github.com/warewulf/warewulf/releases/download/v${WAREWULF_VERSION}/warewulf-dracut-${WAREWULF_VERSION}-1.el10.noarch.rpm | rpm2cpio | cpio -idmf && \
+    curl -L https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-dracut-${WW_VERSION}-1.el10.noarch.rpm | rpm2cpio | cpio -idmf && \
     echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf
 
 ## Install firmware and kernel (ubuntu: linux-firmware-raspi) and kernel
@@ -45,7 +46,7 @@ RUN apt-get install --yes --no-install-recommends \
     rm -v /vmlinuz* /initrd.img*
 
 ## Configure system
-ENV OS_RELEASE='debian13'
+LABEL firmware="efi"
 RUN passwd -d root && \
     systemctl enable systemd-networkd.service && \
     cp /dev/null /etc/machine-id

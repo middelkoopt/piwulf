@@ -1,8 +1,9 @@
 FROM registry.docker.com/rockylinux/rockylinux:10
+ENV OS_RELEASE='el10'
 
 ## Update and setup Rocky
 RUN dnf update -y && \
-    dnf install -y dnf-utils epel-release && \
+    dnf install -y dnf-utils epel-release rocky-release-rpi && \
     dnf config-manager --set-enabled crb && \
     dnf update -y
 
@@ -10,27 +11,26 @@ RUN dnf update -y && \
 RUN dnf install -y dracut && \
     echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 
-## RPi repo and kernel
-RUN dnf install -y rocky-release-rpi && \
-    dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
+## Install Warewulf Dracut
+ARG WW_VERSION=4.6.4
+RUN dnf install -y dracut dracut-network ignition gdisk e2fsprogs && \
+    echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf && \
+    dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-dracut-${WW_VERSION}-1.EL${OS_RELEASE#el}.noarch.rpm
+
+## RPi kernel
+RUN dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree && \
+    chmod 644 /boot/efi/initramfs8
 
 ## Install tools
 RUN dnf install -y ca-certificates procps zstd jq yq && \
     dnf install -y initscripts-service cpio pigz && \
     dnf install -y openssh openssh-clients openssh-server iproute iputils NetworkManager sudo && \
-    dnf install -y nano vim less bash-completion
-
-## Setup .mount units
-COPY *.mount /etc/systemd/system/
-RUN echo "PARTLABEL=rootfs / ext4 defaults,noatime 0 1" > /etc/fstab && \ 
-    systemctl enable boot-efi.mount
+    dnf install -y bind-utils nfs-utils systemd-timesyncd && \
+    dnf install -y nano vim less bash-completion man
 
 ## Configure system
-ENV OS_RELEASE='el10'
+LABEL firmware="efi"
 RUN passwd -d root && \
     sed -i '/alias/d' /root/.bashrc && \
     systemctl enable sshd.service && \
     cp /dev/null /etc/machine-id
-COPY --chmod=600 *.nmconnection /etc/NetworkManager/system-connections/
-COPY config.txt cmdline.txt /boot/efi/
-COPY authorized_keys /root/.ssh/authorized_keys
