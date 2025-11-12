@@ -37,5 +37,5 @@ RUN dnf reinstall -y shadow-utils
 LABEL firmware="efi"
 RUN passwd -d root && \
     sed -i '/alias/d' /root/.bashrc && \
-    systemctl enable sshd.service && \
+    systemctl enable sshd.service systemd-timesyncd && \
     cp /dev/null /etc/machine-id
