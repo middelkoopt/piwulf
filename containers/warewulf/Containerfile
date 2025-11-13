@@ -21,6 +21,7 @@ RUN echo 'allow 10.5.0.0/16' >> /etc/chrony.conf
 RUN dnf install -y nftables && \
     systemctl enable nftables.service && \
     echo 'net.ipv4.ip_forward = 1' > /etc/sysctl.d/80-ip_forward.conf
+    echo 'net.ipv6.conf.all.forwarding = 1' > /etc/sysctl.d/80-ip6_forward.conf
 COPY nat.nft /etc/sysconfig/nftables.conf
 
 ## Warewulf build dependencies

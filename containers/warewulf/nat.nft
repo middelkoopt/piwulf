@@ -5,3 +5,10 @@ table ip nat {
         ip saddr 10.5.0.0/16 masquerade
     }
 }
+
+table ip6 nat {
+    chain postrouting {
+        type nat hook postrouting priority 100; policy accept;
+        ip6 saddr fd00:10:5::/64 masquerade
+    }
+}
