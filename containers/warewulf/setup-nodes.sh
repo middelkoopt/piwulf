@@ -7,12 +7,13 @@ echo "=== setup-nodes.sh"
 
 ## Create profile
 wwctl profile delete --yes nodes || true
-wwctl profile add nodes --profile default
+wwctl profile add nodes --profile default --image nodeimage
 wwctl profile set --yes nodes \
-  --image nodeimage \
   --tagadd "Firmware=efi" \
   --kernelargs '"console=serial0,115200"' \
-  --netdev=eth0 --netmask=255.255.0.0 --gateway=10.5.0.1 --nettagadd="DNS=10.5.0.1"
+  --netdev=end0 \
+  --netmask=255.255.0.0 --gateway=10.5.0.1 --nettagadd="DNS=10.5.0.1" \
+  --prefixlen6=64 --gateway6=fd00:10:5::1 --nettagadd="DNS=fd00:10:5::1"
 
 ## Add to-stage provision to disk
 wwctl profile set --yes nodes \
@@ -31,7 +32,8 @@ for n in $(jq -r ".nodes | keys[]" $SITE) ; do
   wwctl node set --yes ${n} \
     --tagadd="Serial=${serial: -8}" \
     --hwaddr=${mac} \
-    --ipaddr=10.5.1.${i}
+    --ipaddr=10.5.1.${i} \
+    --ipaddr6="fd00:10:5::1:${i}"
 done
 
 ## Import overlays

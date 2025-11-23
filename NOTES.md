@@ -27,5 +27,25 @@ sudo wwctl configure --all
 ```
 
 ## Development
+
+Build
+```bash
+WW_VERSION=v4.6.4
+git clone --no-checkout https://github.com/warewulf/warewulf.git && \
+cd warewulf
+git checkout -B ${WW_VERSION} refs/tags/${WW4_VERSION}
+make config \
+  PREFIX=/usr \
+  SYSCONFDIR=/etc \
+  LOCALSTATEDIR=/var/lib \
+  SHAREDSTATEDIR=/var/lib \
+  TFTPDIR=/var/lib/tftpboot
+make all
+make build 
+sudo make install
+wwctl completion bash > /etc/bash_completion.d/wwctl
+```
+
 ToDo:
- *
+ * Cleanup
+   * Make Ipaddr and Ipaddr6 use the prefix length and then add a "Ip and IP6" to get just the ip?
