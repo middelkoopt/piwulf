@@ -20,9 +20,11 @@
 
 ## Import Overlays
 ```bash
+sudo rm -rf /var/lib/warewulf/overlays/host
 for I in ./containers/warewulf/*.ww ; do
   sudo wwctl overlay import --overwrite host $I /var/lib/tftpboot/
 done
+sudo wwctl configure dhcp
 sudo wwctl configure --all
 ```
 
