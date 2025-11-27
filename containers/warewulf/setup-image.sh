@@ -34,7 +34,11 @@ dnf install -y \
   ca-certificates procps zstd jq yq \
   initscripts-service cpio pigz \
   openssh openssh-clients openssh-server iproute iputils NetworkManager sudo \
+  bind-utils nfs-utils systemd-timesyncd \
   nano vim less bash-completion man
+
+## FIXME: Reinstall packages that require capabilities (required for podman)
+RUN dnf reinstall -y shadow-utils
 
 ## Configure boot
 chmod 644 /boot/efi/initramfs8

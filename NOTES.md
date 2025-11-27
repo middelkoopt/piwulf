@@ -18,18 +18,7 @@
  chmod 644 $(wwctl image show nodeimage)/boot/efi/initramfs8
  ```
 
-## Import Overlays
-```bash
-sudo rm -rf /var/lib/warewulf/overlays/host
-for I in ./containers/warewulf/*.ww ; do
-  sudo wwctl overlay import --overwrite host $I /var/lib/tftpboot/
-done
-sudo wwctl configure dhcp
-sudo wwctl configure --all
-```
-
 ## Development
-
 Build
 ```bash
 WW_VERSION=v4.6.4
