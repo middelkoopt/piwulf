@@ -66,7 +66,7 @@ RUN yq -i '\
     /etc/warewulf/nodes.conf
 
 ## Setup dnsmasq
-RUN echo 'pxe-service=0,"Raspberry Pi Boot"' > /etc/dnsmasq.d/ww4-rpi.conf
+COPY ww4-rpi.conf /etc/dnsmasq.d/
 
 ## Enable man pages
 RUN sed -i '/tsflags=nodocs/d' /etc/dnf/dnf.conf && \
