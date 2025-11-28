@@ -20,7 +20,7 @@ RUN . /etc/os-release && \
 ## Install base packages
 RUN apt-get install --yes --no-install-recommends ca-certificates curl jq zstd cpio pigz procps iproute2 && \
     apt-get install --yes --no-install-recommends init udev dbus polkitd && \
-    apt-get install --yes --no-install-recommends systemd-timesyncd systemd-resolved ifupdown && \
+    apt-get install --yes --no-install-recommends systemd-timesyncd systemd-resolved && \
     apt-get install --yes --no-install-recommends openssh-server python3 && \
     apt-get install --yes nano vim less bash-completion iputils-ping bind9-host
 
@@ -47,7 +47,7 @@ RUN apt-get install --yes --no-install-recommends \
     rm -v /vmlinuz* /initrd.img*
 
 ## Configure system
-LABEL firmware="efi"
+LABEL firmware="firmware"
 RUN passwd -d root && \
     systemctl enable systemd-networkd.service && \
     cp /dev/null /etc/machine-id

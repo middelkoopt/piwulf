@@ -10,3 +10,4 @@ done
 
 sudo wwctl configure dhcp
 sudo wwctl configure --all
+sudo wwctl overlay build
