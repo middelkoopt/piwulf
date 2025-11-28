@@ -49,5 +49,6 @@ RUN apt-get install --yes --no-install-recommends \
 ## Configure system
 LABEL firmware="firmware"
 RUN passwd -d root && \
+    systemctl disable systemd-network-generator && \
     systemctl enable systemd-networkd.service && \
     cp /dev/null /etc/machine-id
