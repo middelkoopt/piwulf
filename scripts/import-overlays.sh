@@ -3,7 +3,7 @@ set -e
 
 echo "=== import-overlays.sh"
 
-sudo wwctl --force=true overlay delete host
+sudo wwctl --force=true overlay delete host || true
 for I in ./containers/warewulf/*.ww ; do
   sudo wwctl overlay import --overwrite host $I /var/lib/tftpboot/
 done

@@ -2,7 +2,12 @@
 {{- range $node := .AllNodes }}
 {{- $cmdline := print "cmdline-" .Tags.Serial ".txt" }}
 {{- $netdev := .NetDevs.default }}
-{{- $baseuri := print "http://" $.Ipaddr ":" $.Warewulf.Port "/provision/" .NetDevs.default.Hwaddr }}
+{{- $baseuri := "" }}
+{{- if $.Ipaddr6 }}
+{{- $baseuri = print "http://[" $.Ipaddr6 "]:" $.Warewulf.Port "/provision/" .NetDevs.default.Hwaddr }}
+{{- else }}
+{{- $baseuri = print "http://" $.Ipaddr ":" $.Warewulf.Port "/provision/" .NetDevs.default.Hwaddr }}
+{{- end }}
 {{- file $cmdline }}
-rd.neednet=1 rd.shell ip=dhcp root=wwinit:{{default "tmpfs" .Root}} wwinit.uri={{ $baseuri }} init=/warewulf/run-init wwid={{$netdev.Hwaddr}} {{ .Kernel.Args | join " " }}
+rd.shell rd.neednet=1 root=wwinit:{{default "tmpfs" .Root}} wwinit.uri={{ $baseuri }} init=/warewulf/run-init wwid={{$netdev.Hwaddr}} {{ .Kernel.Args | join " " }}
 {{ end -}}
