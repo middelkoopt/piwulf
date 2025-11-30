@@ -37,6 +37,12 @@ sudo make install
 wwctl completion bash > /etc/bash_completion.d/wwctl
 ```
 
+## IPv6
+
+The Pi4 will boot off of IPv6, the Pi5 has issues.
+* Set USE_IPV6=1 in the EEPROM
+* Remove the IPv4 DHCP range IP address and do not set dhcp template to static
+
 ToDo:
  * Cleanup
    * Make Ipaddr and Ipaddr6 use the prefix length and then add a "Ip and IP6" to get just the ip?

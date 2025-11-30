@@ -2,8 +2,4 @@
 
 echo "=== config-warewulf.sh"
 
-yq -i '
-    .dhcp.["range6 start"] = "fd00:10:5::2:01" |
-    .dhcp.["range6 end"]   = "fd00:10:5::2:FE" |
-    .ipaddr6 = "fd00:10:5::1/64"
-    ' /etc/warewulf/warewulf.conf
+yq -i '.ipaddr6 = "fd00:10:5::1/64"' /etc/warewulf/warewulf.conf

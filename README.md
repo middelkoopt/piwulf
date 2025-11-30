@@ -47,3 +47,9 @@ BOOT_ORDER=0xf412
 ```
 
 Boot a node with an SD and enjoy.  **Warning:** it will **erase** the SD on provision!
+
+Unlinke for ipxe, where the config files are generated dynamically, for the pi they are a host overlay.  When a node or image is added, or a node updated (kernel ops) the following must be run to rebuild `/var/lib/tftpboot/config.txt` and friends:
+
+```bash
+sudo wwctl configure dhcp
+```
