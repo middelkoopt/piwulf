@@ -11,7 +11,8 @@ manually configuring the Warewulf node (head) manually based on the Warewulf
 container.  All the interesting bits for provisioning a Raspberry Pi are in the
 Warewulf container script files and could be run on any machine.
 
-The interesting bits are in `./containers/warewulf/*.sh`
+The interesting bits are in `./containers/warewulf`
+Lots of tools in `./scripts` for leveraging containers.
 
 Configure an image
 * Add network configuration by placing *.nmconnection files for the node in `./containers/rocky10`.  The internal network should be statically configured.
@@ -22,16 +23,8 @@ Configure an image
 
 Build the image (podman or docker required), gzip optional
 ```bash
-./scripts/build-containers.sh 
-./scripts/image-tar.sh 
-./scripts/container-run.sh ./scripts/image-build.sh
-pigz -f -1 -k ./tmp/warewulf-image.img
+./scripts/build-iso.sh
 ```
-
-Note `./scripts/container-run.sh` has prepackaged utilities for
-`image-build.sh`, notably you need a version of `mkfs.ext4` that supports `-d`.
-You can run just `/scripts/image-build.sh` if you have the proper dependencies
-installed.
 
 Write `./tmp/warewulf-image.img` to a sd card and boot a Pi. **WARNING: this erases `/dev/mmcblk0`, which might be your OS!**
 ```bash
@@ -53,4 +46,4 @@ BOOT_UART=1
 BOOT_ORDER=0xf412
 ```
 
-Boot a node with an SD and enjoy (it will **erase** the sd on provision)
+Boot a node with an SD and enjoy.  **Warning:** it will **erase** the SD on provision!

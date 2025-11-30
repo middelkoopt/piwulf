@@ -1,12 +1,11 @@
 #!/bin/bash
 set -e
 
+: ${CONTAINERS:=${*:-rocky10 warewulf tools debian13}}
 : ${PODMAN:=podman}
 
-# Customize image user with `./build-containers.sh --build-arg "USER=${USER}"`
-
-echo "=== build-containers.sh"
-for IMAGE in rocky10 warewulf tools debian13 ; do
+echo "=== build-containers.sh $CONTAINERS"
+for IMAGE in $CONTAINERS ; do
     echo "--- Building image: ${IMAGE}"
-    $PODMAN build --progress=plain -t ${IMAGE} containers/${IMAGE} $*
+    $PODMAN build --progress=plain -t ${IMAGE} containers/${IMAGE}
 done

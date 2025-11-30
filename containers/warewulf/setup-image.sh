@@ -1,14 +1,20 @@
 #!/bin/bash
+set -e
 
 ## Config
-OS_RELEASE=10
-WW_VERSION=4.6.4
+: ${IMAGE:=${1:-nodeimage}}
+: ${PROFILE:=${2:-nodes}}
+: ${WW_VERSION:=${2:-4.6.4}}
+: ${OS_RELEASE:=10}
+: ${FIRMWARE:=efi}
+
+echo "=== setup-image.sh $IMAGE $PROFILE $WW_VERSION"
 
 ## Import base image
-wwctl image import --build=false docker://ghcr.io/warewulf/warewulf-rockylinux:${OS_RELEASE} nodeimage
+wwctl image import --build=false docker://ghcr.io/warewulf/warewulf-rockylinux:${OS_RELEASE} ${IMAGE}
 
 ## Setup image
-wwctl image exec nodeimage --build=false -- /bin/bash -xe <<EOF
+wwctl image exec ${IMAGE} --build=false -- /bin/bash -xe <<EOF
 ## Remove unneeded packages
 dnf remove -y kernel-core
 
@@ -48,5 +54,10 @@ passwd -d root
 sed -i '/alias/d' /root/.bashrc
 EOF
 
+## Setup profile
+wwctl profile add ${PROFILE} --profile default || true
+wwctl profile set --yes ${PROFILE} --image ${IMAGE}
+wwctl profile set --yes ${PROFILE} --tagadd "Firmware=${FIRMWARE}"
+
 ## Build image
-wwctl image build nodeimage
+wwctl image build ${IMAGE}
