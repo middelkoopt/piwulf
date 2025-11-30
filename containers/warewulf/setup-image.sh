@@ -1,17 +1,26 @@
 #!/bin/bash
 set -e
 
-## Config
-: ${IMAGE:=${1:-nodeimage}}
-: ${PROFILE:=${2:-nodes}}
-: ${WW_VERSION:=${2:-4.6.4}}
+IMAGE="nodeimage"
+PROFILE="nodes"
+WW_VERSION="4.6.4"
+
+while [[ !$# ]]; do
+  case $1 in
+    --image=)  IMAGE=${1#*=}; shift;;
+    --profile=) PROFILE=${1#*=}; shift;;
+    --ww-version=) WW_VERSION=${1#*=}; shift;;
+    *) break ;;
+  esac
+done
+
 : ${OS_RELEASE:=10}
 : ${FIRMWARE:=efi}
 
 echo "=== setup-image.sh $IMAGE $PROFILE $WW_VERSION"
 
 ## Import base image
-wwctl image import --build=false docker://ghcr.io/warewulf/warewulf-rockylinux:${OS_RELEASE} ${IMAGE}
+wwctl image import --force --build=false docker://ghcr.io/warewulf/warewulf-rockylinux:${OS_RELEASE} ${IMAGE}
 
 ## Setup image
 wwctl image exec ${IMAGE} --build=false -- /bin/bash -xe <<EOF
@@ -30,7 +39,9 @@ echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf
 
 ## Install warewulf-dracut
+# FIXME: patch to remove unsupported mpol mount option
 dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-dracut-${WW_VERSION}-1.EL${OS_RELEASE}.noarch.rpm
+sed -i -e 's/-o mpol=interleave //' /usr/lib/dracut/modules.d/90wwinit/load-wwinit.sh
 
 ## Install RPi kernel
 dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree
@@ -44,7 +55,7 @@ dnf install -y \
   nano vim less bash-completion man
 
 ## FIXME: Reinstall packages that require capabilities (required for podman)
-RUN dnf reinstall -y shadow-utils
+dnf reinstall -y shadow-utils
 
 ## Configure boot
 chmod 644 /boot/efi/initramfs8
