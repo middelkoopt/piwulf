@@ -4,8 +4,8 @@ log-debug
 # IPv4
 pxe-service=0,"Raspberry Pi Boot"
 
-# IPv6
+# IPv6 (static hosts must also set:rpi)
 dhcp-host=dc:a6:32:*:*:*,set:rpi
 dhcp-host=e4:5f:01:*:*:*,set:rpi
 dhcp-host=d8:3a:dd:*:*:*,set:rpi
-dhcp-option=tag:warewulf,option6:bootfile-url,"tftp://[fd00:10:5::1]/"
+dhcp-option=tag:rpi,option6:bootfile-url,"tftp://[fd00:10:5::1]/"

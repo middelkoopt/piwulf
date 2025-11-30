@@ -65,9 +65,6 @@ RUN yq -i '\
       del(.nodeprofiles.default.kernel.args[] | select(. == "quiet"))' \
     /etc/warewulf/nodes.conf
 
-## Setup dnsmasq
-COPY ww4-rpi.conf /etc/dnsmasq.d/
-
 ## Enable man pages
 RUN sed -i '/tsflags=nodocs/d' /etc/dnf/dnf.conf && \
     dnf install -y man man-db man-pages
