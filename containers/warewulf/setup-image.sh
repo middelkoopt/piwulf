@@ -7,9 +7,9 @@ WW_VERSION="4.6.4"
 
 while [[ !$# ]]; do
   case $1 in
-    --image=)  IMAGE=${1#*=}; shift;;
-    --profile=) PROFILE=${1#*=}; shift;;
-    --ww-version=) WW_VERSION=${1#*=}; shift;;
+    --image=*) IMAGE=${1#*=}; shift;;
+    --profile=*) PROFILE=${1#*=}; shift;;
+    --ww-version=*) WW_VERSION=${1#*=}; shift;;
     *) break ;;
   esac
 done

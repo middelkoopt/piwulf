@@ -6,10 +6,10 @@ PROFILE="nodes"
 
 while [[ !$# ]]; do
   case $1 in
-    --site=)    SITE=${1#*=}; shift;;
-    --profile=) PROFILE=${1#*=}; shift;;
-    --disk)     DISK=/dev/mmcblk0; shift;;
-    --ipv6)     IPV6=1; shift;;
+    --site=*)    SITE=${1#*=}; shift;;
+    --profile=*) PROFILE=${1#*=}; shift;;
+    --disk)      DISK=/dev/mmcblk0; shift;;
+    --ipv6)      IPV6=1; shift;;
     *) break ;;
   esac
 done
