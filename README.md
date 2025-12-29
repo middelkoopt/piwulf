@@ -23,7 +23,7 @@ Configure an image
 
 Build the image (podman or docker required), gzip optional
 ```bash
-./scripts/build-iso.sh
+./scripts/make-iso.sh
 ```
 
 Write `./tmp/warewulf-image.img` to a sd card and boot a Pi. **WARNING: this erases `/dev/mmcblk0`, which might be your OS!**
