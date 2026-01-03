@@ -46,3 +46,5 @@ The Pi4 will boot off of IPv6, the Pi5 has issues.
 ToDo:
  * Cleanup
    * Make Ipaddr and Ipaddr6 use the prefix length and then add a "Ip and IP6" to get just the ip?
+
+## UEFI Booting

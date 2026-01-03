@@ -1,7 +1,7 @@
 FROM rocky10:latest AS warewulf
 
 ## Raspberry Pi tools
-RUN dnf install -y rocky-sbc-utils cloud-utils-growpart e2fsprogs mtools parted
+RUN dnf install -y cloud-utils-growpart e2fsprogs mtools parted
 
 ## Configure container to boot
 COPY config.txt cmdline.txt /boot/efi/

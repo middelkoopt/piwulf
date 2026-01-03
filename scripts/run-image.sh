@@ -1,0 +1,89 @@
+#!/bin/bash
+set -e
+
+: ${IMAGE_RAM:=2}
+: ${IMAGE_CPUS:=1}
+: ${SESSION:=qemu}
+
+while [[ !$# ]]; do
+  case $1 in
+    --ram=*) RAM=${1#*=}; shift;;
+    --cpus=*) CPUS=${1#*=}; shift;;
+    --session=*) SESSION=${1#*=}; shift;;
+    *) break ;;
+  esac
+done
+
+IMAGE_NAME=${1:-head}
+
+echo "=== run-image.sh ${SESSION} IMAGE_NAME=${IMAGE_NAME} IMAGE_RAM=${IMAGE_RAM} IMAGE_CPUS=${IMAGE_CPUS}"
+
+## Set simplified configuration based on ohpc-jetstream2 run-image.sh
+: ${ARCH:=$(uname -m)}
+: ${QEMU_ACCEL:="-accel kvm"}
+case "$ARCH" in
+    aarch64)
+        QEMU="qemu-system-aarch64 -machine virt -cpu host"
+        QEMU_EFI="/usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
+        ;;
+    x86_64)
+        QEMU="qemu-system-x86_64 -machine q35 -cpu host"
+        QEMU_EFI="/usr/share/qemu/OVMF.fd"
+        ;;
+esac
+
+## Create a new tmux session if it doesn't exist
+if ! tmux has-session -t ${SESSION} ; then
+    echo "--- create new tmux session ${SESSION}"
+    tmux new-session -s ${SESSION} -d
+    tmux set-option -g remain-on-exit failed 
+    tmux set-option -g remain-on-exit-format ""
+fi
+
+echo "--- setup network for ${SESSION}"
+# ## Create a new VDE switch if it doesn't exist
+# if [[ ! -r ./${SESSION}.pid ]] ; then
+#     echo "--- starting new VDE switch"
+#     vde_switch -s ${SESSION}.ctl -p ${SESSION}.pid -d
+# fi
+# QEMU_NET="vde,sock=${SESSION}.ctl"
+
+QEMU_NET="dgram,remote.type=inet,remote.host=224.0.0.1,remote.port=8001"
+
+if [[ $IMAGE_NAME = "head" ]] ; then
+    echo "--- start ${IMAGE_NAME} on ${SESSION}:0"
+    : ${RUN:=tmux new-window -k -t ${SESSION}:0 -n ${IMAGE_NAME}}
+    $RUN $QEMU $QEMU_ACCEL -m ${IMAGE_RAM}G -smp ${IMAGE_CPUS} \
+        -bios $QEMU_EFI \
+        -drive if=virtio,file=./tmp/warewulf-image.img,format=raw \
+        -nic user,model=virtio-net-pci,mac=52:54:00:00:02:0f,hostfwd=tcp::8022-:22,ipv6-net=fd00:2::/64 \
+        -device virtio-net-pci,netdev=net1,mac=52:54:00:05:00:01 \
+        -netdev ${QEMU_NET},id=net1 \
+        -device virtio-rng-pci \
+        -serial mon:stdio -echr 0x05 \
+        -nographic
+else
+    ## Create a new backing disk (overwrites existing disk)
+    echo "--- create new disk image ${IMAGE_NAME}.qcow2"
+    qemu-img create -f qcow2 ${IMAGE_NAME}.qcow2 10G
+
+    ## Start QEMU
+    printf -v IMAGE_ID "%02x" ${IMAGE_NAME//[^0-9]}
+    echo "--- start ${IMAGE_NAME} on ${SESSION}:${IMAGE_ID}"
+    : ${RUN:=tmux new-window -k -t ${SESSION}:${IMAGE_ID} -n ${IMAGE_NAME}}
+
+    $RUN $QEMU $QEMU_ACCEL -m ${IMAGE_RAM}G -smp ${IMAGE_CPUS} \
+        -bios $QEMU_EFI \
+        -drive if=virtio,file=${IMAGE_NAME}.qcow2,format=qcow2 \
+        -device virtio-net-pci,netdev=net0,mac=52:54:00:05:01:${IMAGE_ID} \
+        -netdev ${QEMU_NET},id=net0 \
+        -fw_cfg name=opt/org.tianocore/IPv4PXESupport,string=y \
+        -fw_cfg name=opt/org.tianocore/IPv6PXESupport,string=y \
+        -device virtio-rng-pci \
+        -qmp unix:/$PWD/${IMAGE_NAME}.sock,server,nowait \
+        -serial mon:stdio -echr 0x05 \
+        -nographic
+fi
+
+echo "--- attaching to tmux session"
+exec tmux attach -t ${SESSION}:0

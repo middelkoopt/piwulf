@@ -3,7 +3,7 @@ ENV OS_RELEASE='el10'
 
 ## Update and setup Rocky
 RUN dnf update -y && \
-    dnf install -y dnf-utils epel-release rocky-release-rpi && \
+    dnf install -y dnf-utils epel-release && \
     dnf config-manager --set-enabled crb && \
     dnf update -y
 
@@ -12,18 +12,39 @@ RUN dnf install -y dracut && \
     echo 'hostonly="no"' > /etc/dracut.conf.d/wwinit.conf
 
 ## Install Warewulf Dracut
-# FIXME: patch wwinit.conf to ignore systems that don't have root=wwinit set. https://github.com/warewulf/warewulf/pull/2066
-# FIXME: patch to remove mpol mount option not supported by the kernel
+# FIXME: fix to remove mpol mount option not supported by the kernel
+# FIXME: fix wwinit.conf to ignore systems that don't have root=wwinit set. https://github.com/warewulf/warewulf/pull/2066 (merged)
 ARG WW_VERSION=4.6.4
-RUN dnf install -y dracut dracut-network ignition gdisk e2fsprogs && \
+RUN dnf install -y dracut dracut-tools dracut-network ignition gdisk e2fsprogs && \
     dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-dracut-${WW_VERSION}-1.EL${OS_RELEASE#el}.noarch.rpm && \
     echo 'add_dracutmodules+=" wwinit ignition "' >> /etc/dracut.conf.d/wwinit.conf && \
     sed -i -e 's/-o mpol=interleave //' /usr/lib/dracut/modules.d/90wwinit/load-wwinit.sh && \
     sed -i -e '1a [ -z "${wwinit_root_device}" ] && return 0' /usr/lib/dracut/modules.d/90wwinit/load-wwinit.sh
 
+## UEFI Kernel
+ARG UEFI=1
+RUN if [ $UEFI = 1 ] ; then \
+    dnf install -y systemd-ukify systemd-boot binutils && \
+    dnf install -y --setopt=install_weak_deps=False kernel-core && \
+    declare -A efi_arch=( [x86_64]=X64 [aarch64]=AA64 ) && \
+    install -dvp /boot/efi/EFI/BOOT && \
+    echo "console=serial0,115200 root=PARTLABEL=rootfs rd.shell" > /etc/kernel/cmdline && \
+    ukify build \
+      --linux /usr/lib/modules/*/vmlinuz \
+      --initrd /boot/initramfs-*.img \
+      --os-release @/etc/os-release \
+      --cmdline @/etc/kernel/cmdline \
+      --output /boot/efi/EFI/BOOT/BOOT${efi_arch[$HOSTTYPE]}.EFI ; \
+    fi
+
 ## RPi kernel
-RUN dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree && \
-    chmod 644 /boot/efi/initramfs8
+ARG RPI=1
+RUN if [ $RPI = 1 -a $HOSTTYPE = aarch64 ]; then \
+    dnf install -y rocky-release-rpi && \
+    dnf install -y rocky-sbc-utils && \
+    dnf install -y --setopt=install_weak_deps=False kernel-rpi-4k-core kernel-rpi-firmware rpi-firmware-bluez rpi-firmware-nonfree && \
+    chmod 644 /boot/efi/initramfs8 ; \
+    fi
 
 ## Install tools
 RUN dnf install -y ca-certificates procps zstd jq yq && \

@@ -9,7 +9,7 @@ echo "=== image-build.sh"
 
 ## Disk
 # partition table/offset 1 MiB
-: ${BOOT_SIZE:=128} # MiB
+: ${BOOT_SIZE:=250} # MiB
 : ${ROOT_SIZE:=2} # GiB
 # partition end/alignment 1 MiB
 SIZE=$(( 1 + BOOT_SIZE + ROOT_SIZE*1024 + 1 )) # MiB
