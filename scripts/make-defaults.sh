@@ -16,7 +16,7 @@ done
 
 if [[ ! -f ./containers/warewulf/site.json ]] ; then
     echo "--- Copy site.json template"
-    cp -v ./containers/examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
+    cp -v ./examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
 fi
 
 EXAMPLES=(./containers/warewulf/*.nmconnection)

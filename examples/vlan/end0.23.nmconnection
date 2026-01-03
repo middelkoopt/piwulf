@@ -1,0 +1,15 @@
+[connection]
+id=end0.23
+uuid=06804432-d98c-4830-8dd6-ec9eec4018bb
+type=vlan
+
+[vlan]
+id=23
+parent=end0
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+addr-gen-mode=eui64

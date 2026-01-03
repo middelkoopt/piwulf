@@ -1,13 +1,11 @@
 [connection]
 id=end0.5
-uuid=0e0c8724-e6fb-4fff-8e5a-ee7573d9ef8c
+uuid=c184e259-2f6c-4f42-abe7-00432b135043
 type=vlan
 
 [vlan]
 id=5
 parent=end0
-
-[ethernet]
 
 [ipv4]
 method=manual
@@ -16,3 +14,4 @@ address=10.5.0.1/16
 [ipv6]
 method=manual
 address=fd00:10:5::1/64
+addr-gen-mode=eui64
