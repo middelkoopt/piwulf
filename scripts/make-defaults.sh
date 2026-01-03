@@ -2,7 +2,9 @@
 set -e
 shopt -s nullglob
 
-echo "=== ./make-defaults.sh ==="
+: ${TEMPLATE:=${1:-qemu}}
+
+echo "=== ./make-defaults.sh ${TEMPLATE}"
 
 for IMAGE in warewulf ; do
     if [[ ! -f ./containers/${IMAGE}/authorized_keys ]] ; then
@@ -14,11 +16,11 @@ done
 
 if [[ ! -f ./containers/warewulf/site.json ]] ; then
     echo "--- Copy site.json template"
-    cp -v ./containers/examples/site.json ./containers/warewulf/site.json
+    cp -v ./containers/examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
 fi
 
 EXAMPLES=(./containers/warewulf/*.nmconnection)
 if [[ ${#EXAMPLES[@]} == 0 ]] ; then
     echo "--- Copy networking examples"
-    cp -v ./examples/*.nmconnection ./containers/warewulf
+    cp -v ./examples/${TEMPLATE}/*.nmconnection ./containers/warewulf
 fi

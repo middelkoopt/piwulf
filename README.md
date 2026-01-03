@@ -17,11 +17,22 @@ Lots of tools in `./scripts` for leveraging containers.
 Configure an image
 * Add network configuration by placing *.nmconnection files for the node in `./containers/rocky10`.  The internal network should be statically configured.
 * Describe your nodes with `./containers/warewulf/site.json`
-* Set root ssh key in `./containers/rocky10/authorized_keys`
-* Set admin key in `./containers/rocky10/authorized_keys`
+* Set admin key in `./containers/warewulf/authorized_keys`
 * Run `./scripts/make-defaults.sh` to generate some defaults. See script file and examples for details.
 
-Build the image (podman or docker required), gzip optional
+Install dependencies (EL)
+```bash
+dnf install -y podman pigz
+dnf install -y qemu-system
+```
+
+Install dependencies (deb)
+```bash
+apt-get install --yes podman pigz
+apt-get install --yes qemu-system
+```
+
+Build the image (podman or docker required)
 ```bash
 ./scripts/make-iso.sh
 ```

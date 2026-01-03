@@ -1,11 +1,6 @@
 [connection]
-id=end0.5
+id=enp0s3
 uuid=0e0c8724-e6fb-4fff-8e5a-ee7573d9ef8c
-type=vlan
-
-[vlan]
-id=5
-parent=end0
 
 [ethernet]
 

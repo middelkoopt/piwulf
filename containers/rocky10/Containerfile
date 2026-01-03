@@ -28,7 +28,7 @@ RUN if [ $UEFI = 1 ] ; then \
     dnf install -y --setopt=install_weak_deps=False kernel-core && \
     declare -A efi_arch=( [x86_64]=X64 [aarch64]=AA64 ) && \
     install -dvp /boot/efi/EFI/BOOT && \
-    echo "console=serial0,115200 root=PARTLABEL=rootfs rd.shell" > /etc/kernel/cmdline && \
+    echo "console=ttyS0,115200 root=PARTLABEL=rootfs rd.shell" > /etc/kernel/cmdline && \
     ukify build \
       --linux /usr/lib/modules/*/vmlinuz \
       --initrd /boot/initramfs-*.img \
