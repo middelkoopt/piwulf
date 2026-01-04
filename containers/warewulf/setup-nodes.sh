@@ -30,8 +30,11 @@ for n in $(jq -r ".nodes | keys[]" $SITE) ; do
 done
 
 echo "--- Import overlays"
-for I in *.ww ; do
+for I in cmdline.txt.ww config.txt.ww images.ww ; do
   wwctl overlay import --overwrite host $I /var/lib/tftpboot/
+done
+for I in *.conf.ww ; do
+  wwctl overlay import --overwrite host $I /etc/dnsmasq.d/
 done
 
 echo "---Reconfigure warewulf and build overlays"

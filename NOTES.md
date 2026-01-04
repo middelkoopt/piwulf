@@ -9,6 +9,12 @@
  wwctl image delete --yes nodeimage
  ```
  
+ ## QEMU dependencies
+
+```bash
+dnf install -y qemu-system
+```
+
  ## Boot to tmpfs
  Raspberry Pi does not support mpol option
  ```bash

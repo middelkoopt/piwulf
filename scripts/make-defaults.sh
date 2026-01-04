@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-shopt -s nullglob
 
 : ${TEMPLATE:=${1:-qemu}}
 
@@ -14,13 +13,9 @@ for IMAGE in warewulf ; do
     fi
 done
 
-if [[ ! -f ./containers/warewulf/site.json ]] ; then
-    echo "--- Copy site.json template"
-    cp -v ./examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
-fi
+echo "--- Copy site.json template"
+cp -v ./examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
 
-EXAMPLES=(./containers/warewulf/*.nmconnection)
-if [[ ${#EXAMPLES[@]} == 0 ]] ; then
-    echo "--- Copy networking examples"
-    cp -v ./examples/${TEMPLATE}/*.nmconnection ./containers/warewulf
-fi
+echo "--- Copy networking examples"
+rm -v ./containers/warewulf/*.nmconnection
+cp -v ./examples/${TEMPLATE}/*.nmconnection ./containers/warewulf
