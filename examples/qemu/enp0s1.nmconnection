@@ -1,0 +1,10 @@
+[connection]
+uuid=972130e8-dde1-11ef-aff8-1fe9ed51401c
+type=ethernet
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+addr-gen-mode=eui64
