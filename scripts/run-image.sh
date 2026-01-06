@@ -4,6 +4,7 @@ set -e
 : ${IMAGE_RAM:=2}
 : ${IMAGE_CPUS:=1}
 : ${SESSION:=qemu}
+: ${TMP:=./tmp}
 
 while [[ !$# ]]; do
   case $1 in
@@ -40,14 +41,6 @@ if ! tmux has-session -t ${SESSION} ; then
     tmux set-option -g remain-on-exit-format ""
 fi
 
-echo "--- setup network for ${SESSION}"
-# ## Create a new VDE switch if it doesn't exist
-# if [[ ! -r ./${SESSION}.pid ]] ; then
-#     echo "--- starting new VDE switch"
-#     vde_switch -s ${SESSION}.ctl -p ${SESSION}.pid -d
-# fi
-# QEMU_NET="vde,sock=${SESSION}.ctl"
-
 QEMU_NET="dgram,remote.type=inet,remote.host=224.0.0.1,remote.port=8001"
 
 if [[ $IMAGE_NAME = "head" ]] ; then
@@ -55,7 +48,7 @@ if [[ $IMAGE_NAME = "head" ]] ; then
     : ${RUN:=tmux new-window -k -t ${SESSION}:0 -n ${IMAGE_NAME}}
     $RUN $QEMU $QEMU_ACCEL -m ${IMAGE_RAM}G -smp ${IMAGE_CPUS} \
         -bios $QEMU_EFI \
-        -drive if=virtio,file=./tmp/warewulf-image.img,format=raw \
+        -drive if=virtio,file=${TMP}/warewulf-image.img,format=raw \
         -nic user,model=virtio-net-pci,mac=52:54:00:00:02:0f,hostfwd=tcp::8022-:22,ipv6-net=fd00:2::/64 \
         -device virtio-net-pci,netdev=net1,mac=52:54:00:05:00:01 \
         -netdev ${QEMU_NET},id=net1 \
@@ -64,8 +57,8 @@ if [[ $IMAGE_NAME = "head" ]] ; then
         -nographic
 else
     ## Create a new backing disk (overwrites existing disk)
-    echo "--- create new disk image ${IMAGE_NAME}.qcow2"
-    qemu-img create -f qcow2 ${IMAGE_NAME}.qcow2 10G
+    echo "--- create new disk image ${TMP}/${IMAGE_NAME}.qcow2"
+    qemu-img create -f qcow2 ${TMP}/${IMAGE_NAME}.qcow2 10G
 
     ## Start QEMU
     printf -v IMAGE_ID "%02x" ${IMAGE_NAME//[^0-9]}
@@ -74,16 +67,17 @@ else
 
     $RUN $QEMU $QEMU_ACCEL -m ${IMAGE_RAM}G -smp ${IMAGE_CPUS} \
         -bios $QEMU_EFI \
-        -drive if=virtio,file=${IMAGE_NAME}.qcow2,format=qcow2 \
+        -drive if=virtio,file=${TMP}/${IMAGE_NAME}.qcow2,format=qcow2 \
         -device virtio-net-pci,netdev=net0,mac=52:54:00:05:01:${IMAGE_ID} \
         -netdev ${QEMU_NET},id=net0 \
         -fw_cfg name=opt/org.tianocore/IPv4PXESupport,string=y \
         -fw_cfg name=opt/org.tianocore/IPv6PXESupport,string=y \
         -device virtio-rng-pci \
-        -qmp unix:/$PWD/${IMAGE_NAME}.sock,server,nowait \
         -serial mon:stdio -echr 0x05 \
         -nographic
-fi
 
-echo "--- attaching to tmux session"
-exec tmux attach -t ${SESSION}:0
+    if [ "$(tmux list-clients -t ${SESSION})" == "" ] ; then
+        echo "--- attaching to tmux session"
+        exec tmux attach -t ${SESSION}:${IMAGE_NAME//[^0-9]}
+    fi
+fi

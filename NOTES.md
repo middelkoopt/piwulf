@@ -15,15 +15,6 @@
 dnf install -y qemu-system
 ```
 
- ## Boot to tmpfs
- Raspberry Pi does not support mpol option
- ```bash
- wwctl profile set nodes --root tmpfs
- sed -i 's/-o mpol=interleave //' $(wwctl image show nodeimage)/usr/lib/dracut/modules.d/90wwinit/load-wwinit.sh
- wwctl image exec --build=false nodeimage -- /usr/bin/dracut -f /boot/efi/initramfs8
- chmod 644 $(wwctl image show nodeimage)/boot/efi/initramfs8
- ```
-
 ## Development
 Build
 ```bash
@@ -54,3 +45,33 @@ ToDo:
    * Make Ipaddr and Ipaddr6 use the prefix length and then add a "Ip and IP6" to get just the ip?
 
 ## UEFI Booting
+
+Setup Registry
+```bash
+REGISTRY=pilab:5000
+install -dvp ~/.config/containers/
+cat > ~/.config/containers/registries.conf <<EOF
+[[registry]]
+location = "${REGISTRY}"
+insecure = true
+EOF
+```
+
+Push to registry from build host
+```bash
+REGISTRY=pilab:5000
+podman tag rocky10 ${REGISTRY}/rocky10
+podman push ${REGISTRY}/rocky10
+```
+
+Configure node
+```bash
+./setup-head.sh
+REGISTRY=pilab:5000
+wwctl image import docker://${REGISTRY}/rocky10:latest rocky10
+wwctl image build rocky10
+./setup-nodes.sh
+wwctl profile set --yes nodes --image rocky10 --tagadd IPXEMenuEntry=dracut
+wwctl configure --all
+wwctl overlay build
+```

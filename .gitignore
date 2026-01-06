@@ -1,5 +1,6 @@
 *.img
 *.img.gz
+*.qcow2
 authorized_keys
 id_rsa
 id_rsa.pub

@@ -1,6 +1,8 @@
 [connection]
+id=enp0s2
 uuid=0e0c8724-e6fb-4fff-8e5a-ee7573d9ef8c
 type=ethernet
+interface-name=enp0s2
 
 [ipv4]
 method=manual
