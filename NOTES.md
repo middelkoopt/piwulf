@@ -44,6 +44,21 @@ ToDo:
  * Cleanup
    * Make Ipaddr and Ipaddr6 use the prefix length and then add a "Ip and IP6" to get just the ip?
 
+## Provision to disk
+
+```bash
+wwctl profile set --yes nodes \
+  --diskname=/dev/mmcblk0 --diskwipe \
+  --partname=EFI --partcreate --partnumber=1 --partsize=250M \
+  --parttype=C12A7328-F81F-11D2-BA4B-00A0C93EC93B \
+  --fsname=EFI --fswipe --fsformat=vfat --fspath=/boot/efi
+wwctl profile set --yes nodes \
+  --diskname=/dev/mmcblk0 --diskwipe \
+  --partname=rootfs --partcreate --partnumber=2 \
+  --fsname=rootfs --fswipe --fsformat=ext4 --fspath=/
+wwctl profile set --yes nodes --root=/dev/disk/by-partlabel/rootfs
+```
+
 ## UEFI Booting
 
 Push to registry from build host
