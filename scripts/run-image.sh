@@ -6,7 +6,7 @@ set -e
 : ${SESSION:=qemu}
 : ${TMP:=./tmp}
 
-while [[ !$# ]]; do
+while (( $# )); do
   case $1 in
     --ram=*) RAM=${1#*=}; shift;;
     --cpus=*) CPUS=${1#*=}; shift;;

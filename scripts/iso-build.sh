@@ -53,7 +53,7 @@ echo "--- cleanup"
 rm -f ${TMP}/warewulf-image.tar
 rm -rf ${TMP}/bootfs
 
-echo "--- done"
+echo "--- mount with"
 echo "mdir -i ${PART} ::/"
 echo "sudo mount -o loop,offset=$((BOOT_PART_OFFSET*512)) ${DISK} /mnt"
 echo "sudo mount -o loop,offset=$((ROOT_PART_OFFSET*512)) ${DISK} /mnt"

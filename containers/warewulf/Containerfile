@@ -1,7 +1,7 @@
 FROM rocky10:latest AS warewulf
 
 ## Raspberry Pi tools
-RUN dnf install -y cloud-utils-growpart e2fsprogs mtools parted
+RUN dnf install -y cloud-utils-growpart ncurses e2fsprogs mtools parted
 
 ## Configure container to boot
 COPY config.txt cmdline.txt /boot/efi/
@@ -25,30 +25,34 @@ RUN dnf install -y nftables && \
 COPY nat.nft /etc/sysconfig/nftables.conf
 
 ## Warewulf build dependencies
-# RUN dnf install -y git unzip cpio && \
-#     dnf install -y golang make && \
-#     dnf install -y --setopt=install_weak_deps=False gpgme-devel python3-sphinx python3-sphinx_rtd_theme
+RUN dnf install -y git unzip cpio && \
+    dnf install -y golang make && \
+    dnf install -y --setopt=install_weak_deps=False gpgme-devel python3-sphinx python3-sphinx_rtd_theme
 
-## Build Warewulf
-# ARG WW_VERSION=v4.6.4
-# RUN git clone --no-checkout https://github.com/warewulf/warewulf.git /usr/src/warewulf && \
-#     cd /usr/src/warewulf && \
-#     git checkout -B ${WW_VERSION} refs/tags/${WW4_VERSION} && \
-#     make config \
-#       PREFIX=/usr \
-#       SYSCONFDIR=/etc \
-#       LOCALSTATEDIR=/var/lib \
-#       SHAREDSTATEDIR=/var/lib \
-#       TFTPDIR=/var/lib/tftpboot && \
-#     make all && \
-#     make build && \
-#     make install && \
-#     wwctl completion bash > /etc/bash_completion.d/wwctl
+## Build Warewulf (main or tag - v4.6.4)
+ARG WW_VERSION=main
+RUN git clone --no-checkout https://github.com/warewulf/warewulf.git /usr/src/warewulf && \
+    cd /usr/src/warewulf && \
+    git fetch --tags && \
+    git checkout -B ${WW_VERSION} ${WW_VERSION} && \
+    make config \
+      PREFIX=/usr \
+      SYSCONFDIR=/etc \
+      LOCALSTATEDIR=/var/lib \
+      SHAREDSTATEDIR=/var/lib \
+      TFTPDIR=/var/lib/tftpboot && \
+    make all && \
+    make build && \
+    make install && \
+    wwctl completion bash > /etc/bash_completion.d/wwctl && \
+    cp -v etc/warewulf.conf-el10 /etc/warewulf/warewulf.conf
 
 ## Install Warewulf
-ARG WW_VERSION=4.6.4
-RUN dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-${WW_VERSION}-1.${OS_RELEASE}.$(uname -m).rpm && \
-    dnf install -y ipxe-bootimgs-aarch64 ipxe-bootimgs-x86 && \
+# ARG WW_VERSION=4.6.4
+# RUN dnf install -y https://github.com/warewulf/warewulf/releases/download/v${WW_VERSION}/warewulf-${WW_VERSION}-1.${OS_RELEASE}.$(uname -m).rpm && \
+
+## Install Warewulf dependencies
+RUN dnf install -y dnsmasq ipxe-bootimgs-aarch64 ipxe-bootimgs-x86 && \
     systemctl enable warewulfd.service dnsmasq.service
 
 ## Setup warewulf.conf

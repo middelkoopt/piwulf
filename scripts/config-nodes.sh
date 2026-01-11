@@ -4,7 +4,7 @@ set -e
 SITE="./containers/warewulf/site.json"
 PROFILE="nodes"
 
-while [[ !$# ]]; do
+while (( $# )); do
   case $1 in
     --site=*)    SITE=${1#*=}; shift;;
     --profile=*) PROFILE=${1#*=}; shift;;

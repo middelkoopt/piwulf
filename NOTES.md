@@ -46,7 +46,14 @@ ToDo:
 
 ## UEFI Booting
 
-Setup Registry
+Push to registry from build host
+```bash
+REGISTRY=pilab:5000
+podman tag rocky10 ${REGISTRY}/rocky10
+podman push ${REGISTRY}/rocky10
+```
+
+Setup Registry and configure node
 ```bash
 REGISTRY=pilab:5000
 install -dvp ~/.config/containers/
@@ -55,18 +62,9 @@ cat > ~/.config/containers/registries.conf <<EOF
 location = "${REGISTRY}"
 insecure = true
 EOF
-```
 
-Push to registry from build host
-```bash
-REGISTRY=pilab:5000
-podman tag rocky10 ${REGISTRY}/rocky10
-podman push ${REGISTRY}/rocky10
-```
-
-Configure node
-```bash
 ./setup-head.sh
+
 REGISTRY=pilab:5000
 wwctl image import docker://${REGISTRY}/rocky10:latest rocky10
 wwctl image build rocky10
