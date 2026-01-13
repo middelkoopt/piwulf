@@ -10,6 +10,11 @@
       "serial": "cff0f163563cea77",
       "mac": "d8:3a:dd:c5:c1:f3"
     },
+     "k53": {
+      "hardware": "pi5",
+      "serial": "55dab53133ee7bb1",
+      "mac": "88:a2:9e:2e:3b:cf"
+    },
     "k400": {
       "hardware": "pi400",
       "serial": "1000000000fadff1",
