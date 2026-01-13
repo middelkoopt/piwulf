@@ -88,3 +88,11 @@ wwctl profile set --yes nodes --image rocky10 --tagadd IPXEMenuEntry=dracut
 wwctl configure --all
 wwctl overlay build
 ```
+
+## Ignition
+
+```yaml
+        - ignition.firstboot
+        - ignition.config.url=http://192.168.23.103/ignition.json
+        - ignition.platform.id=metal
+```
