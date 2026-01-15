@@ -17,5 +17,5 @@ echo "--- Copy site.json template"
 cp -v ./examples/${TEMPLATE}/site.json ./containers/warewulf/site.json
 
 echo "--- Copy networking examples"
-rm -v ./containers/warewulf/*.nmconnection
+rm -fv ./containers/warewulf/*.nmconnection
 cp -v ./examples/${TEMPLATE}/*.nmconnection ./containers/warewulf
