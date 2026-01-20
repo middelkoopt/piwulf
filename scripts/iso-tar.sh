@@ -4,9 +4,9 @@ set -e
 : ${PODMAN:=podman}
 : ${TMP:=./tmp}
 
-echo "=== image-tar.sh ${TMP}"
+echo "=== iso-tar.sh ${TMP}"
 
-install -d --mode=0755 ${TMP}
+install -d -m 0755 ${TMP}
 
 echo "--- create container"
 $PODMAN create --replace --name=warewulf-image warewulf:latest

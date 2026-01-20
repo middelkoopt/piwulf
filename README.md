@@ -62,3 +62,17 @@ Unlike for iPXE, where the config files are generated dynamically, for the pi th
 ```bash
 sudo wwctl configure dhcp
 ```
+
+## Running on a Mac
+
+install podman with lima via
+```bash
+brew install lima podman qemu tmux
+limactl create --yes --mount-writable template:podman
+limactl start podman
+```
+Follow the displayed instructions (copy-paste) to link the vm and host (podman socket)
+```bash
+podman system connection add lima-podman "unix://${HOME}/.lima/podman/sock/podman.sock"
+podman system connection default lima-podman
+```

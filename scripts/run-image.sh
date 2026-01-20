@@ -20,16 +20,26 @@ IMAGE_NAME=${1:-head}
 echo "=== run-image.sh ${SESSION} IMAGE_NAME=${IMAGE_NAME} IMAGE_RAM=${IMAGE_RAM} IMAGE_CPUS=${IMAGE_CPUS}"
 
 ## Set simplified configuration based on ohpc-jetstream2 run-image.sh
+
+: ${OS:=$(uname -s)}
 : ${ARCH:=$(uname -m)}
-: ${QEMU_ACCEL:="-accel kvm"}
-case "$ARCH" in
-    aarch64)
+
+QEMU_ACCEL="-accel kvm"
+QEMU_NETDEV="dgram,remote.type=inet,remote.host=224.0.0.1,remote.port=8001"
+
+case "${OS}-${ARCH}" in
+    Linux-aarch64)
         QEMU="qemu-system-aarch64 -machine virt -cpu host"
         QEMU_EFI="/usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
         ;;
-    x86_64)
+    Linux-x86_64)
         QEMU="qemu-system-x86_64 -machine q35 -cpu host"
         QEMU_EFI="/usr/share/qemu/OVMF.fd"
+        ;;
+    Darwin-arm64)
+        QEMU="qemu-system-aarch64 -machine virt -cpu host"
+        QEMU_EFI="/opt/homebrew/Cellar/qemu/*/share/qemu/edk2-aarch64-code.fd"
+        QEMU_ACCEL="-accel hvf"
         ;;
 esac
 
@@ -41,7 +51,6 @@ if ! tmux has-session -t ${SESSION} ; then
     tmux set-option -g remain-on-exit-format ""
 fi
 
-QEMU_NET="dgram,remote.type=inet,remote.host=224.0.0.1,remote.port=8001"
 
 if [[ $IMAGE_NAME = "head" ]] ; then
     echo "--- start ${IMAGE_NAME} on ${SESSION}:0"
@@ -51,7 +60,7 @@ if [[ $IMAGE_NAME = "head" ]] ; then
         -drive if=virtio,file=${TMP}/warewulf-image.img,format=raw \
         -nic user,model=virtio-net-pci,mac=52:54:00:00:02:0f,hostfwd=tcp::8022-:22,ipv6-net=fd00:2::/64 \
         -device virtio-net-pci,netdev=net1,mac=52:54:00:05:00:01 \
-        -netdev ${QEMU_NET},id=net1 \
+        -netdev ${QEMU_NETDEV},id=net1 \
         -device virtio-rng-pci \
         -serial mon:stdio -echr 0x05 \
         -nographic
@@ -69,7 +78,7 @@ else
         -bios $QEMU_EFI \
         -drive if=virtio,file=${TMP}/${IMAGE_NAME}.qcow2,format=qcow2 \
         -device virtio-net-pci,netdev=net0,mac=52:54:00:05:01:${IMAGE_ID} \
-        -netdev ${QEMU_NET},id=net0 \
+        -netdev ${QEMU_NETDEV},id=net0 \
         -fw_cfg name=opt/org.tianocore/IPv4PXESupport,string=y \
         -fw_cfg name=opt/org.tianocore/IPv6PXESupport,string=y \
         -device virtio-rng-pci \
