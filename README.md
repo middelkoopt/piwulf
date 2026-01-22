@@ -55,6 +55,17 @@ BOOT_UART=1
 BOOT_ORDER=0xf412
 ```
 
+Pi 5 with POE
+```
+[all]
+BOOT_UART=1
+BOOT_ORDER=0xf412
+POWER_OFF_ON_HALT=0
+TFTP_FILE_TIMEOUT=60000
+PSU_MAX_CURRENT=5000
+USE_IPV6=0
+```
+
 Boot a node with an SD and enjoy.  **Warning:** it will **erase** the SD on provision!
 
 Unlike for iPXE, where the config files are generated dynamically, for the pi they are in a a host overlay.  When a node or image is added, or a node updated (kernel ops) the following must be run to rebuild `/var/lib/tftpboot/config.txt` and friends:
