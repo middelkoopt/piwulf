@@ -50,7 +50,7 @@ if ! tmux has-session -t ${SESSION} ; then
 fi
 
 ## Start VDE if avilable and not running
-if [[ $(command -v vde_switchX) ]]; then
+if [[ $(command -v vde_switch) ]]; then
     if ! tmux has-session -t ${SESSION}:100 ; then
         tmux new-window -k -t ${SESSION}:100 -n vde vde_switch -s ${TMP}/vde.ctl
     fi
