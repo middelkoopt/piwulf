@@ -19,13 +19,11 @@ IMAGE_NAME=${1:-head}
 
 echo "=== run-image.sh ${SESSION} IMAGE_NAME=${IMAGE_NAME} IMAGE_RAM=${IMAGE_RAM} IMAGE_CPUS=${IMAGE_CPUS}"
 
-## Set simplified configuration based on ohpc-jetstream2 run-image.sh
-
 : ${OS:=$(uname -s)}
 : ${ARCH:=$(uname -m)}
 
 QEMU_ACCEL="-accel kvm"
-QEMU_NETDEV="dgram,remote.type=inet,remote.host=224.0.0.1,remote.port=8001"
+QEMU_NETDEV="dgram,remote.type=inet,remote.host=239.255.5.1,remote.port=8001"
 
 case "${OS}-${ARCH}" in
     Linux-aarch64)
@@ -51,6 +49,13 @@ if ! tmux has-session -t ${SESSION} ; then
     tmux set-option -g remain-on-exit-format ""
 fi
 
+## Start VDE if avilable and not running
+if [[ $(command -v vde_switchX) ]]; then
+    if ! tmux has-session -t ${SESSION}:100 ; then
+        tmux new-window -k -t ${SESSION}:100 -n vde vde_switch -s ${TMP}/vde.ctl
+    fi
+    QEMU_NETDEV="vde,sock=${TMP}/vde.ctl"
+fi
 
 if [[ $IMAGE_NAME = "head" ]] ; then
     echo "--- start ${IMAGE_NAME} on ${SESSION}:0"

@@ -67,7 +67,7 @@ sudo wwctl configure dhcp
 
 install podman with lima via
 ```bash
-brew install lima podman qemu tmux
+brew install lima podman qemu vde tmux
 limactl create --yes --mount-writable template:podman
 limactl start podman
 ```
